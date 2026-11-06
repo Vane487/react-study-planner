@@ -1,0 +1,64 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  color: #344054;
+  font-weight: 700;
+  border: 1px solid #b8c7da;
+  border-radius: 0.6rem;
+  background: #ffffff;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button--primary {
+  color: #ffffff;
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.button--filter {
+  color: #475467;
+}
+
+.button--active {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  background: #dbeafe;
+}
+
+.button--success {
+  color: #067647;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.button--danger {
+  color: #b42318;
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.button--header {
+  flex: 0 0 auto;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.button--toast {
+  min-height: 2rem;
+  color: #1d4ed8;
+  border: 0;
+  background: #ffffff;
+}

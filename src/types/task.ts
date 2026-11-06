@@ -12,3 +12,5 @@ export interface Task {
 }
 
 export type NewTask = Omit<Task, 'id' | 'completed'>
+
+export type TaskChanges = NewTask

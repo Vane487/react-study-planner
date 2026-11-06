@@ -1,0 +1,12 @@
+.planner {
+  width: min(920px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 3rem 0;
+}
+
+@media (max-width: 700px) {
+  .planner {
+    width: min(100% - 1rem, 920px);
+    padding: 1rem 0;
+  }
+}

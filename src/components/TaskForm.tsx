@@ -1,83 +1,128 @@
 import { useState, type FormEvent } from 'react'
-import type { NewTask, Priority } from '../types/task'
+import { useTaskContext } from '../hooks/useTaskContext'
+import type { Priority, Task } from '../types/task'
+import './TaskForm.scss'
 
-interface TaskFormProps {
-  onAdd: (task: NewTask) => void
+interface FormValues {
+  title: string
+  description: string
+  category: string
+  priority: Priority
 }
 
-export function TaskForm({ onAdd }: TaskFormProps) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('React')
-  const [priority, setPriority] = useState<Priority>('medium')
+const emptyForm: FormValues = {
+  title: '',
+  description: '',
+  category: 'React',
+  priority: 'medium',
+}
+
+function getFormValues(task: Task | null): FormValues {
+  if (!task) return emptyForm
+
+  return {
+    title: task.title,
+    description: task.description,
+    category: task.category,
+    priority: task.priority,
+  }
+}
+
+export function TaskForm() {
+  const { editingTask } = useTaskContext()
+
+  return <TaskFormFields key={editingTask?.id ?? 'new'} editingTask={editingTask} />
+}
+
+interface TaskFormFieldsProps {
+  editingTask: Task | null
+}
+
+function TaskFormFields({ editingTask }: TaskFormFieldsProps) {
+  const { addTask, cancelEditing, updateTask } = useTaskContext()
+  const [form, setForm] = useState<FormValues>(() => getFormValues(editingTask))
   const [error, setError] = useState('')
+
+  function updateField<K extends keyof FormValues>(field: K, value: FormValues[K]): void {
+    setForm((previousForm) => ({ ...previousForm, [field]: value }))
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault()
 
-    if (!title.trim()) {
+    if (!form.title.trim()) {
       setError('Введи назву завдання.')
       return
     }
 
-    onAdd({
-      title: title.trim(),
-      description: description.trim() || 'Опис не додано.',
-      category: category.trim() || 'Без категорії',
-      priority,
-    })
+    const taskData = {
+      title: form.title.trim(),
+      description: form.description.trim() || 'Опис не додано.',
+      category: form.category.trim() || 'Без категорії',
+      priority: form.priority,
+    }
 
-    setTitle('')
-    setDescription('')
-    setCategory('React')
-    setPriority('medium')
+    if (editingTask) {
+      updateTask(editingTask.id, taskData)
+    } else {
+      addTask(taskData)
+      setForm(emptyForm)
+    }
+
     setError('')
+  }
+
+  function handleCancel(): void {
+    cancelEditing()
   }
 
   return (
     <section className="task-form" aria-labelledby="task-form-title">
-      <h2 id="task-form-title" className="task-form__title">
-        Нове завдання
-      </h2>
+      <div className="task-form__heading">
+        <h2 id="task-form-title" className="task-form__title">
+          {editingTask ? 'Редагування завдання' : 'Нове завдання'}
+        </h2>
+        {editingTask && <p className="task-form__hint">Зміни дані та збережи їх.</p>}
+      </div>
 
       <form className="task-form__fields" onSubmit={handleSubmit}>
-        <label className="field">
-          <span className="field__label">Назва *</span>
+        <label className="task-form__field">
+          <span className="task-form__label">Назва *</span>
           <input
-            className="field__control"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
+            className="task-form__control"
+            value={form.title}
+            onChange={(event) => updateField('title', event.target.value)}
             placeholder="Наприклад, повторити props"
           />
         </label>
 
-        <label className="field">
-          <span className="field__label">Опис</span>
+        <label className="task-form__field">
+          <span className="task-form__label">Опис</span>
           <textarea
-            className="field__control field__control--textarea"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
+            className="task-form__control task-form__control--textarea"
+            value={form.description}
+            onChange={(event) => updateField('description', event.target.value)}
             placeholder="Коротко напиши, що треба зробити"
           />
         </label>
 
         <div className="task-form__row">
-          <label className="field">
-            <span className="field__label">Категорія</span>
+          <label className="task-form__field">
+            <span className="task-form__label">Категорія</span>
             <input
-              className="field__control"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              className="task-form__control"
+              value={form.category}
+              onChange={(event) => updateField('category', event.target.value)}
               placeholder="React"
             />
           </label>
 
-          <label className="field">
-            <span className="field__label">Пріоритет</span>
+          <label className="task-form__field">
+            <span className="task-form__label">Пріоритет</span>
             <select
-              className="field__control"
-              value={priority}
-              onChange={(event) => setPriority(event.target.value as Priority)}
+              className="task-form__control"
+              value={form.priority}
+              onChange={(event) => updateField('priority', event.target.value as Priority)}
             >
               <option value="low">Низький</option>
               <option value="medium">Середній</option>
@@ -92,9 +137,16 @@ export function TaskForm({ onAdd }: TaskFormProps) {
           </p>
         )}
 
-        <button className="button button--primary" type="submit">
-          Додати завдання
-        </button>
+        <div className="task-form__actions">
+          <button className="button button--primary" type="submit">
+            {editingTask ? 'Зберегти зміни' : 'Додати завдання'}
+          </button>
+          {editingTask && (
+            <button className="button" type="button" onClick={handleCancel}>
+              Скасувати
+            </button>
+          )}
+        </div>
       </form>
     </section>
   )

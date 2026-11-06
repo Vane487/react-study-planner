@@ -1,0 +1,36 @@
+.task-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.task-stats__item {
+  display: grid;
+  gap: 0.2rem;
+  padding: 1rem;
+  border-radius: 0.85rem;
+  background: #e0e7ff;
+}
+
+.task-stats__item--completed {
+  background: #dcfce7;
+}
+
+.task-stats__item--active {
+  background: #fef3c7;
+}
+
+.task-stats__text {
+  color: #475467;
+}
+
+.task-stats__value {
+  font-size: 1.7rem;
+}
+
+@media (max-width: 700px) {
+  .task-stats {
+    grid-template-columns: 1fr;
+  }
+}
